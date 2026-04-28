@@ -25,7 +25,7 @@ interface UploadResult {
   ranked_trials?: TrialResult[];
   explanation?: string;
 }
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export default function UploadCard() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -46,7 +46,8 @@ export default function UploadCard() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("http://127.0.0.1:8000/upload/", {
+
+      const response = await fetch(`${API_URL}/upload/`, {
         method: "POST",
         body: formData,
       });
@@ -67,8 +68,9 @@ export default function UploadCard() {
     try {
       setChatLoading(true);
       setChatReply("");
+      
+      const response = await fetch(`${API_URL}/chat/`, {
 
-      const response = await fetch("http://127.0.0.1:8000/chat/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
