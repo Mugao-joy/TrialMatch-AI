@@ -5,6 +5,7 @@ from fastapi import APIRouter, UploadFile, File
 from app.services.extract_text import extract_text
 from app.services.llm_extractor import extract_patient_profile
 from app.services.trial_search import search_trials
+from app.services.eligibility_matcher import match_trials
 
 router = APIRouter(prefix="/upload", tags=["Upload"])
 
@@ -27,7 +28,9 @@ async def upload_file(file: UploadFile = File(...)):
 
     trials = search_trials(diagnosis)
 
+    ranked_trials = match_trials(patient_profile, trials)
+
     return {
         "patient_profile": patient_profile,
-        "trials": trials,
+        "ranked_trials": ranked_trials,
     }

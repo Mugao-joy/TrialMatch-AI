@@ -13,13 +13,15 @@ interface PatientProfile {
 }
 
 interface TrialResult {
-  BriefTitle?: string[];
-  NCTId?: string[];
+  trial_title?: string;
+  nct_id?: string;
+  match_score?: number;
+  reason?: string;
 }
 
 interface UploadResult {
   patient_profile?: PatientProfile;
-  trials?: TrialResult[];
+  ranked_trials?: TrialResult[];
 }
 
 export default function UploadCard() {
@@ -179,24 +181,33 @@ export default function UploadCard() {
             </div>
           </div>
 
-          {/* Matching Trials */}
+          {/* Ranked Trials */}
           <div className="bg-slate-50 rounded-xl p-6">
             <h3 className="text-2xl font-semibold text-slate-900">
-              Matching Trials
+              Recommended Trials
             </h3>
 
-            {result.trials?.length ? (
+            {result.ranked_trials?.length ? (
               <div className="mt-4 space-y-4">
-                {result.trials.map((trial, index) => (
+                {result.ranked_trials.map((trial, index) => (
                   <div
                     key={index}
                     className="border rounded-lg p-4 bg-white shadow-sm"
                   >
                     <p className="font-semibold text-slate-900">
-                      {trial.BriefTitle?.[0] || "Untitled Trial"}
+                      {trial.trial_title || "Untitled Trial"}
                     </p>
+
                     <p className="text-sm text-slate-500">
-                      {trial.NCTId?.[0] || "No Trial ID"}
+                      {trial.nct_id || "No Trial ID"}
+                    </p>
+
+                    <p className="text-teal-600 font-medium mt-2">
+                      {trial.match_score || 0}% Match
+                    </p>
+
+                    <p className="text-slate-500 text-sm mt-1">
+                      {trial.reason || "No explanation available."}
                     </p>
                   </div>
                 ))}
