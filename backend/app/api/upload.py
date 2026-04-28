@@ -6,11 +6,15 @@ from app.services.extract_text import extract_text
 from app.services.llm_extractor import extract_patient_profile
 from app.services.trial_search import search_trials
 from app.services.eligibility_matcher import match_trials
+from app.agents.graph import build_graph
 
 router = APIRouter(prefix="/upload", tags=["Upload"])
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+graph = build_graph()
+
+
 
 
 @router.post("/")
@@ -29,8 +33,11 @@ async def upload_file(file: UploadFile = File(...)):
     trials = search_trials(diagnosis)
 
     ranked_trials = match_trials(patient_profile, trials)
+    result = graph.invoke({
+        "file_path": file_path
+    })
 
     return {
-        "patient_profile": patient_profile,
-        "ranked_trials": ranked_trials,
+         "patient_profile": result["patient_profile"],
+        "ranked_trials": result["ranked_trials"]
     }
