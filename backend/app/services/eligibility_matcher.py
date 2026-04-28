@@ -22,17 +22,30 @@ def clean_json_response(content: str):
     return "[]"
 
 
-def match_trials(patient_profile, trials):
+def match_trials(patient_profile, trials, context):
     prompt = f"""
 You are a clinical trial eligibility assistant.
 
-Patient profile:
+Use the provided medical guidelines and protocol context to improve matching accuracy.
+
+Guidelines Context:
+{context}
+
+Patient Profile:
 {json.dumps(patient_profile, indent=2)}
 
 Trials:
 {json.dumps(trials[:3], indent=2)}
 
-Analyze each trial against the patient profile and assign a realistic match score from 0 to 100.
+Analyze each trial against:
+- diagnosis compatibility
+- biomarker overlap
+- mutation overlap
+- age compatibility
+- gender compatibility
+- treatment compatibility
+
+Assign a realistic match score from 0 to 100.
 
 Scoring guide:
 - 90–100 = highly compatible
@@ -56,7 +69,7 @@ Return ONLY valid JSON:
         messages=[
             {
                 "role": "system",
-                "content": "You return only JSON.",
+                "content": "You are a medical AI assistant that returns only JSON.",
             },
             {"role": "user", "content": prompt},
         ],

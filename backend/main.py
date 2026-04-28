@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.upload import router as upload_router
 from app.db.database import engine
 from app.db.models import Base
+from app.api.chat import router as chat_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -17,6 +18,7 @@ app.add_middleware(
 )
 
 app.include_router(upload_router)
+app.include_router(chat_router)
 
 
 @app.get("/")

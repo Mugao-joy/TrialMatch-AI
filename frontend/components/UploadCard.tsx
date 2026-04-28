@@ -20,14 +20,19 @@ interface TrialResult {
 }
 
 interface UploadResult {
+  session_id?: string;
   patient_profile?: PatientProfile;
   ranked_trials?: TrialResult[];
+  explanation?: string;
 }
 
 export default function UploadCard() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false);
   const [result, setResult] = useState<UploadResult | null>(null);
+  const [chatMessage, setChatMessage] = useState("");
+  const [chatReply, setChatReply] = useState("");
 
   const handleUpload = async () => {
     if (!file) {
@@ -53,6 +58,34 @@ export default function UploadCard() {
       alert("Upload failed.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleChat = async () => {
+    if (!chatMessage || !result?.session_id) return;
+
+    try {
+      setChatLoading(true);
+      setChatReply("");
+
+      const response = await fetch("http://127.0.0.1:8000/chat/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          session_id: result.session_id,
+          message: chatMessage,
+        }),
+      });
+
+      const data = await response.json();
+      setChatReply(data.reply);
+      setChatMessage("");
+    } catch (error) {
+      console.error("Chat failed:", error);
+    } finally {
+      setChatLoading(false);
     }
   };
 
@@ -216,6 +249,47 @@ export default function UploadCard() {
               <p className="mt-4 text-slate-500">
                 No matching trials found.
               </p>
+            )}
+          </div>
+
+          {/* Explanation */}
+          <div className="bg-slate-50 rounded-xl p-6">
+            <h3 className="text-2xl font-semibold text-slate-900">
+              AI Explanation
+            </h3>
+            <p className="text-slate-600 mt-4 whitespace-pre-line">
+              {result.explanation || "No explanation available."}
+            </p>
+          </div>
+
+          {/* Chat */}
+          <div className="bg-slate-50 rounded-xl p-6">
+            <h3 className="text-2xl font-semibold text-slate-900">
+              Ask TrialMatch AI
+            </h3>
+
+            <input
+              type="text"
+              placeholder="Why was trial 2 ranked low?"
+              value={chatMessage}
+              onChange={(e) => setChatMessage(e.target.value)}
+              className="mt-4 w-full border border-gray-300 rounded-lg p-3"
+            />
+
+            <button
+              onClick={handleChat}
+              disabled={chatLoading}
+              className="mt-4 bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg"
+            >
+              {chatLoading ? "Thinking..." : "Ask"}
+            </button>
+
+            {chatReply && (
+              <div className="mt-4 bg-white p-4 rounded-lg shadow-sm">
+                <p className="text-slate-700 whitespace-pre-line">
+                  {chatReply}
+                </p>
+              </div>
             )}
           </div>
         </div>
