@@ -1,0 +1,21 @@
+Patient Name: Jane Doe
+Age: 34
+Gender: Female
+
+Diagnosis:
+Stage II Breast Cancer
+
+Biomarkers:
+HER2 Positive
+BRCA1 Negative
+BRCA2 Negative
+
+Medical History:
+No prior chemotherapy
+No prior radiation therapy
+
+Current Medications:
+Tamoxifen
+
+Location:
+Mumbai,India
